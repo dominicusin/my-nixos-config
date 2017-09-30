@@ -94,6 +94,10 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
   # Set your time zone.
   time.timeZone = "Europe/Tiraspol";
 
+  fonts.enableCoreFonts = true;
+
+  nix.binaryCaches = [ http://cache.nixos.org http://hydra.nixos.org ];
+
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   nixpkgs.config.allowUnfree = true;
