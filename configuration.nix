@@ -1,8 +1,9 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
+#{ config, pkgs, ... }:
 
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   imports =
@@ -17,30 +18,26 @@
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
   boot.supportedFilesystems = [ "bcachefs" "btrfs" "cifs" "exfat" "ext" "f2fs" "glusterfs" "jfs" "nfs" "ntfs" "reiserfs" "unionfs-fuse" "vboxsf" "vfat" "xfs" "zfs" "hfsplus" ];
-  boot.kernelParams = [    "video=1920x1080"  ];
-  boot.kernelModules = [ "snd-seq" "snd-rawmidi"  "kvm-intel" "r8169" "snd_hda_intel" "exfat" "exfat-nofuse" ];
-  boot.initrd.kernelModules = [ "fbcon" ];
+  boot.kernelParams = [ "video=1920x1080" ];
+  boot.kernelModules = [ "snd-seq" "snd-rawmidi"  "kvm-intel" "r8169" "snd_hda_intel" "exfat" "exfat-nofuse" "msr" "coretemp"  ];
+  boot.kernelPatches = [ pkgs.kernelPatches.ubuntu_fan_4_4 ];
+  boot.kernelPackages = pkgs.linuxPackages_4_4;
+  boot.blacklistedKernelModules = [ "snd_pcsp" "b43" "bcma" "bcma-pci-bridge" ];
+  boot.initrd.kernelModules = [ "fbcon" "ohci_hcd" "ehci_hcd" "pata_amd" "sata_nv" "usb_storage" ];
   boot.cleanTmpDir = true;
   # Define on which hard drive you want to install Grub.
-  boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.timeout = 4;
+  boot.loader.grub.device = "nodev";   # "/dev/sda"; # or "nodev" for efi only
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernel.sysctl = {
+      # Note that inotify watches consume 1kB on 64-bit machines.
+      "fs.inotify.max_user_watches"   = 1048576;   # default:  8192
+      "fs.inotify.max_user_instances" =    1024;   # default:   128
+      "fs.inotify.max_queued_events"  =   32768;   # default: 16384
+  };
   boot.loader.grub.extraEntries = 
              ''
-
-
-menuentry 'Windows Vista (на /dev/sda2)' --class windows --class os $menuentry_id_option 'osprober-chain-5AD0500FD04FEFB5' {
-	savedefault
-	insmod part_gpt
-	insmod ntfs
-	set root='hd0,gpt2'
-	if [ x$feature_platform_search_hint = xy ]; then
-	  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,gpt2 --hint-efi=hd0,gpt2 --hint-baremetal=ahci0,gpt2  5AD0500FD04FEFB5
-	else
-	  search --no-floppy --fs-uuid --set=root 5AD0500FD04FEFB5
-	fi
-	chainloader +1
-}
-
-
 menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_option 'osprober-chain-5AD0500FD04FEFB5' {
 		insmod part_gpt
 		insmod ntfs
@@ -54,33 +51,35 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
 		  search --no-floppy --fs-uuid --set=root 5AD0500FD04FEFB5
 		fi
 		ntldr /bootmgr
-		#chainloader /EFI/Microsoft/Boot/bootmgfw.efi
-		#chainloader /efi/boot/bootx64.efi.windows
 		chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+		#chainloader /efi/boot/bootx64.efi.windows
 		boot
+		chainloader +1
 }
-
-
 
            ''
 ;
 
 
   nixpkgs.config.pulseaudio = true;
-  hardware.pulseaudio = {
-    enable = true;
-    package = pkgs.pulseaudioFull;
-  };
 
 
 
   networking = {
       hostName = "absolon";
       hostId = "a8c0b902";
-      networkmanager.enable = true;
-      wireless.enable = false;
+      networkmanager.enable = lib.mkForce true;
+      networkmanager.insertNameservers = [ "8.8.8.8" "8.8.4.4" ];
+      nameservers = [ "8.8.8.8" "8.8.4.4" ];
+      wireless.enable = lib.mkForce false;
       enableIPv6 = true;
-
+      enableIntel3945ABGFirmware = true;
+      enableIntel2200BGFirmware = true;
+     # Open ports in the firewall.
+     # networking.firewall.allowedTCPPorts = [ ... ];
+     # networking.firewall.allowedUDPPorts = [ ... ];
+     # Or disable the firewall altogether.
+     firewall.enable = false;
   };
 
 
@@ -89,14 +88,37 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
      consoleFont = "cyr-sun16";
      consoleKeyMap = "ru";
      defaultLocale = "ru_RU.UTF-8";
+     #consoleUseXkbConfig = true;
   };
+
 
   # Set your time zone.
   time.timeZone = "Europe/Tiraspol";
 
   fonts.enableCoreFonts = true;
 
-  nix.binaryCaches = [ http://cache.nixos.org http://hydra.nixos.org ];
+  virtualisation.docker.enable = true;
+  virtualisation.docker.storageDriver = "devicemapper";
+
+  hardware = {
+      enableRedistributableFirmware = true;
+      cpu.intel.updateMicrocode = true;
+      cpu.amd.updateMicrocode = false;
+      facetimehd.enable = true;
+      opengl.enable = true;
+      opengl.driSupport32Bit = true;
+      opengl.extraPackages = with pkgs; [ vaapiIntel libvdpau-va-gl vaapiVdpau ];
+      opengl.extraPackages32 = with pkgs.pkgsi686Linux; [ vaapiIntel libvdpau-va-gl vaapiVdpau ];
+      pulseaudio = {
+            enable = true;
+            package = pkgs.pulseaudioFull;
+            support32Bit = true;
+            daemon.config = {
+                 flat-volumes = "no";
+            };
+      };
+      bluetooth.enable = true;
+  };
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
@@ -105,6 +127,7 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
   environment.systemPackages = with pkgs; [
     wget mc htop gpm tmux curl acpi
     binutils gcc gnumake pkgconfig git
+    python36Full
     i3lock i3status
     unclutter rxvt_unicode
     qt5.qtbase
@@ -116,11 +139,6 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  networking.firewall.enable = false;
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -135,7 +153,7 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
   services.xserver.xkbOptions = "grp:alt_shift_toggle,grp:win_switch,terminate:ctrl_alt_bksp,grp_led:scroll,altwin:menu";
   services.xserver.videoDrivers = [ "intel" ];
   services.xserver.autorun = true;
-  hardware.opengl.driSupport32Bit = true;
+
 
 
 
@@ -198,9 +216,12 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
   system.autoUpgrade.channel = https://nixos.org/channels/nixos-17.03;
   system.stateVersion = "17.03";
 
+  nix.binaryCaches = [ http://cache.nixos.org http://hydra.nixos.org ];
+  nix.maxJobs = 4;
   nix.gc.automatic = true;
   nix.gc.dates = "daily";
   nix.gc.options = "--delete-older-than 1h";
 
 
 }
+

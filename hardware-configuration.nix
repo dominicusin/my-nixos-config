@@ -24,7 +24,7 @@
       options = [ "subvol=@home" "compress=zlib" ];
     };
 
-  fileSystems."/boot" =
+  fileSystems."/mnt/mainboot" =
     { device = "/dev/disk/by-uuid/185e34fe-4a77-42a5-a7af-f8d1be061c68";
       fsType = "ext4";
     };
