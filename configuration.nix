@@ -125,13 +125,15 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    wget mc htop gpm tmux curl acpi
-    binutils gcc gnumake pkgconfig git
-    python36Full
-    i3lock i3status
-    unclutter rxvt_unicode
-    qt5.qtbase
-
+    wget mc htop gpm tmux curl acpi    binutils gcc gnumake pkgconfig git
+    python36Full    i3lock i3status    unclutter rxvt_unicode    qt5.qtbase
+    abduco abiword anki arandr asciinema aws-auth awscli bazaar bind binutils blueman bmon bridge-utils clac cmus cnijfilter2 compton ctags cups-bjnp cvs cvs_fast_export darcs deluge desktop_file_utils dhcp dhcpcd
+    di dmenu2 dnsmasq dropbox dunst dvtm emacs evince exa exiv2 ezstream file firefoxWrapper fuse fzf gimp git git-series glib global glxinfo gnome3 gnupg21 google-chrome gpick graphviz gtk2 gtypist haskellPackages
+    hdparm hicolor_icon_theme hipchat hotspot hplip htop idea iftop inkscape iomelt iptables irssi isync iw jdk jnettop jq lcdproc leiningen libreoffice libsysfs libva lr lsof lxc lynx man-pages mc mercurialFull
+    mkpasswd mongodb-tools mosh mpv msmtp mtr ncdu ncurses neomutt networkmanagerapplet nix-index nix-prefetch-scripts nix-repl nmap notmuch nq nssTools openocd openssl openvswitch pagemon pass pavucontrol pciutils
+    peco pinentry playerctl powertop psmisc python2Full python2Packages pythonPackages qdirstat ranger reptyr ripgrep rofi rpm rtags rxvt_unicode_with-plugins scrot shared_mime_info silver-searcher skype socat spotify
+    sshfsFuse sshpass stalonetray stunnel sublime3 subversion sxhkd sxiv taffybar tango-icon-theme taskwarrior termite texstudio tmux torbrowser tree tweak unzip urlview usbutils vanilla-dmz vdpauinfo vifm vimHuge vis
+    vmtouch vnstat w3m-full watchman weechat wget wiggle winetricks wineUnstable wmctrl xautolock xclip xe xidel xlsfonts xorg xsel xss-lock xsv zathura zip zoom-us zsh
   ];
 
   # List services that you want to enable:
