@@ -17,6 +17,21 @@
   # boot.loader.grub.efiSupport = true;
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  # Define on which hard drive you want to install Grub.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.timeout = 4;
+  boot.loader.grub.device = "nodev";   # "/dev/sda"; # or "nodev" for efi only
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.grub.extraEntries =
+	''
+if [ -f  ${config_directory}/custom.cfg ]; then
+  source ${config_directory}/custom.cfg
+elif [ -z "${config_directory}" -a -f  $prefix/custom.cfg ]; then
+  source $prefix/custom.cfg;
+fi
+	''
+;
+
   boot.supportedFilesystems = [ "bcachefs" "btrfs" "cifs" "exfat" "ext" "f2fs" "glusterfs" "jfs" "nfs" "ntfs" "reiserfs" "unionfs-fuse" "vboxsf" "vfat" "xfs" "zfs" "hfsplus" ];
   boot.kernelParams = [ "video=1920x1080" ];
   boot.kernelModules = [ "snd-seq" "snd-rawmidi"  "kvm-intel" "r8169" "snd_hda_intel" "exfat" "exfat-nofuse" "msr" "coretemp"  ];
@@ -25,43 +40,13 @@
   boot.blacklistedKernelModules = [ "snd_pcsp" "b43" "bcma" "bcma-pci-bridge" ];
   boot.initrd.kernelModules = [ "fbcon" "ohci_hcd" "ehci_hcd" "pata_amd" "sata_nv" "usb_storage" ];
   boot.cleanTmpDir = true;
-  # Define on which hard drive you want to install Grub.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.timeout = 4;
-  boot.loader.grub.device = "nodev";   # "/dev/sda"; # or "nodev" for efi only
-  boot.loader.efi.canTouchEfiVariables = true;
   boot.kernel.sysctl = {
       # Note that inotify watches consume 1kB on 64-bit machines.
       "fs.inotify.max_user_watches"   = 1048576;   # default:  8192
       "fs.inotify.max_user_instances" =    1024;   # default:   128
       "fs.inotify.max_queued_events"  =   32768;   # default: 16384
   };
-  boot.loader.grub.extraEntries = 
-             ''
-menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_option 'osprober-chain-5AD0500FD04FEFB5' {
-		insmod part_gpt
-		insmod ntfs
-		insmod ntldr
-		insmod search_fs_uuid
-		insmod chain
-		set root='hd0,gpt2'
-		if [ x$feature_platform_search_hint = xy ]; then
-		  search --no-floppy --fs-uuid --set=root --hint-bios=hd0,gpt2 --hint-efi=hd0,gpt2 --hint-baremetal=ahci0,gpt2 --hint='hd0,gpt2'  5AD0500FD04FEFB5
-		else
-		  search --no-floppy --fs-uuid --set=root 5AD0500FD04FEFB5
-		fi
-		ntldr /bootmgr
-		chainloader /EFI/Microsoft/Boot/bootmgfw.efi
-		#chainloader /efi/boot/bootx64.efi.windows
-		boot
-		chainloader +1
-}
 
-           ''
-;
-
-
-  nixpkgs.config.pulseaudio = true;
 
 
 
@@ -122,18 +107,16 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    wget mc htop gpm tmux curl acpi    binutils gcc gnumake pkgconfig git
-    python36Full    i3lock i3status    unclutter rxvt_unicode    qt5.qtbase
-    abduco abiword anki arandr asciinema aws-auth awscli bazaar bind binutils blueman bmon bridge-utils clac cmus cnijfilter2 compton ctags cups-bjnp cvs cvs_fast_export darcs deluge desktop_file_utils dhcp dhcpcd
-    di dmenu2 dnsmasq dropbox dunst dvtm emacs evince exa exiv2 ezstream file firefoxWrapper fuse fzf gimp git git-series glib global glxinfo gnome3 gnupg21 google-chrome gpick graphviz gtk2 gtypist haskellPackages
-    hdparm hicolor_icon_theme hipchat hotspot hplip htop idea iftop inkscape iomelt iptables irssi isync iw jdk jnettop jq lcdproc leiningen libreoffice libsysfs libva lr lsof lxc lynx man-pages mc mercurialFull
-    mkpasswd mongodb-tools mosh mpv msmtp mtr ncdu ncurses neomutt networkmanagerapplet nix-index nix-prefetch-scripts nix-repl nmap notmuch nq nssTools openocd openssl openvswitch pagemon pass pavucontrol pciutils
-    peco pinentry playerctl powertop psmisc python2Full python2Packages pythonPackages qdirstat ranger reptyr ripgrep rofi rpm rtags rxvt_unicode_with-plugins scrot shared_mime_info silver-searcher skype socat spotify
-    sshfsFuse sshpass stalonetray stunnel sublime3 subversion sxhkd sxiv taffybar tango-icon-theme taskwarrior termite texstudio tmux torbrowser tree tweak unzip urlview usbutils vanilla-dmz vdpauinfo vifm vimHuge vis
-    vmtouch vnstat w3m-full watchman weechat wget wiggle winetricks wineUnstable wmctrl xautolock xclip xe xidel xlsfonts xorg xsel xss-lock xsv zathura zip zoom-us zsh
+    abduco abiword acpi anki arandr asciinema aws-auth awscli bazaar bind binutils blueman bmon bridge-utils cmus cnijfilter2 compton ctags cups-bjnp curl cvs cvs_fast_export darcs deluge desktop_file_utils 
+#    dhcp dhcpcd di dmenu2 dnsmasq dropbox dunst dvtm emacs evince exiv2 file firefoxWrapper fuse fzf gcc gimp git glib global glxinfo gnome3 gnumake gnupg21 google-chrome gpm graphviz gtk2 gtypist haskellPackages 
+#    hdparm hicolor_icon_theme hipchat hplip htop i3lock i3status idea iftop inkscape iomelt iptables irssi isync iw jdk jnettop jq leiningen libreoffice libsysfs libva lr lsof lxc lynx man-pages mc mercurialFull 
+#    mkpasswd mongodb-tools mosh mpv msmtp mtr ncdu ncurses neomutt networkmanagerapplet nix-prefetch-scripts nix-repl nmap notmuch nq nssTools openocd openssl openvswitch pagemon pass pavucontrol pciutils peco 
+#    pinentry pkgconfig playerctl powertop psmisc python2Full python2Packages python36Full pythonPackages qt5.qtbase ranger reptyr ripgrep rofi rpm rtags rxvt_unicode rxvt_unicode_with-plugins scrot 
+#    shared_mime_info silver-searcher skype socat sshfsFuse sshpass stalonetray stunnel sublime3 subversion sxhkd sxiv taffybar tango-icon-theme taskwarrior termite texstudio tmux torbrowser tree tweak 
+#    unclutter unzip urlview usbutils vanilla-dmz vdpauinfo vifm vis vmtouch vnstat w3m-full watchman weechat wget winetricks wineUnstable wmctrl xautolock xclip xe xidel xlsfonts xorg xsel xss-lock 
+    zathura zip zsh
   ];
 
   # List services that you want to enable:
@@ -218,11 +201,17 @@ menuentry 'Windows  (на /dev/sda2)' --class windows --class os $menuentry_id_o
   system.autoUpgrade.channel = https://nixos.org/channels/nixos-17.03;
   system.stateVersion = "17.03";
 
+  nixpkgs.config.allowBroken = false;
+  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.pulseaudio = true;
+
   nix.binaryCaches = [ http://cache.nixos.org http://hydra.nixos.org ];
   nix.maxJobs = 4;
   nix.gc.automatic = true;
   nix.gc.dates = "daily";
   nix.gc.options = "--delete-older-than 1h";
+
+
 
 
 }
