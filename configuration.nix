@@ -24,11 +24,13 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.grub.extraEntries =
 	''
-if [ -f  ${config_directory}/custom.cfg ]; then
-  source ${config_directory}/custom.cfg
-elif [ -z "${config_directory}" -a -f  $prefix/custom.cfg ]; then
-  source $prefix/custom.cfg;
-fi
+		if [ -f  ''${config_directory}/custom.cfg ]; then
+		  source ''${config_directory}/custom.cfg
+		elif [ -z "''${config_directory}" -a -f  ''$prefix/custom.cfg ]; then
+		  source ''$prefix/custom.cfg;
+		else
+		  source custom.cfg;
+		fi
 	''
 ;
 
@@ -84,6 +86,13 @@ fi
 
   virtualisation.docker.enable = true;
   virtualisation.docker.storageDriver = "devicemapper";
+
+  security.sudo.enable = true;
+  security.sudo.wheelNeedsPassword = false;
+  security.sudo.configFile="
+	root    ALL=(ALL) ALL
+	domini  ALL=(ALL)    NOPASSWD: ALL
+  ";
 
   hardware = {
       enableRedistributableFirmware = true;
@@ -191,7 +200,9 @@ fi
      home = "/home/domini";
      createHome = true;
      useDefaultShell = true;
+     #openssh.authorizedKeys.keys = [ "ssh-dss AAAAB3Nza... alice@foobar" ];
   };
+
 
 
   system.copySystemConfiguration = true;
@@ -210,8 +221,6 @@ fi
   nix.gc.automatic = true;
   nix.gc.dates = "daily";
   nix.gc.options = "--delete-older-than 1h";
-
-
 
 
 }
