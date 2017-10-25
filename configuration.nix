@@ -44,9 +44,29 @@
   boot.cleanTmpDir = true;
   boot.kernel.sysctl = {
       # Note that inotify watches consume 1kB on 64-bit machines.
-      "fs.inotify.max_user_watches"   = 1048576;   # default:  8192
-      "fs.inotify.max_user_instances" =    1024;   # default:   128
-      "fs.inotify.max_queued_events"  =   32768;   # default: 16384
+	"fs.inotify.max_user_watches"   = 1048576;   # default:  8192
+	"fs.inotify.max_user_instances" =    1024;   # default:   128
+	"fs.inotify.max_queued_events"  =   32768;   # default: 16384
+	"dev.cdrom.autoclose" = 0;
+	"kernel.parameters.consoleblank" = 0;
+	"kernel.pax.softmode" = 0;
+	"kernel.perf_event_max_sample_rate" = 30000;
+#	"kernel.printk" = "1 1 1 1";
+	"kernel.shmall" = 2097152;
+	"kernel.shmmax" = 33554432;
+	"kernel.sysrq" = 1;
+	"net.core.rmem_max" = 50000000;
+	"net.core.wmem_max" = 1048576;
+	"net.ipv4.conf.all.accept_redirects" = 0;
+	"net.ipv4.conf.all.send_redirects" = 0;
+	"net.ipv4.conf.default.accept_redirects" = 0;
+	"net.ipv4.conf.default.send_redirects" = 0;
+	"net.ipv4.tcp_congestion_control" = "yeah";
+	"net.ipv4.tcp_fastopen" = 1;
+	"net.ipv4.tcp_slow_start_after_idle" = 0;
+	"net.ipv6.conf.all.accept_redirects" = 0;
+	"net.ipv6.conf.default.accept_redirects" = 0;
+	"vm.swappiness" = 90;
   };
 
 
@@ -224,4 +244,5 @@
 
 
 }
+
 
