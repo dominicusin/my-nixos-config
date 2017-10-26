@@ -37,10 +37,11 @@
   boot.supportedFilesystems = [ "bcachefs" "btrfs" "cifs" "exfat" "ext" "f2fs" "glusterfs" "jfs" "nfs" "ntfs" "reiserfs" "unionfs-fuse" "vboxsf" "vfat" "xfs" "zfs" "hfsplus" ];
   boot.kernelParams = [ "video=1920x1080" ];
   boot.kernelModules = [ "snd-seq" "snd-rawmidi"  "kvm-intel" "r8169" "snd_hda_intel" "exfat" "exfat-nofuse" "msr" "coretemp"  ];
-  boot.kernelPatches = [ pkgs.kernelPatches.ubuntu_fan_4_4 ];
-  boot.kernelPackages = pkgs.linuxPackages_4_4;
+  #boot.kernelPatches = [ pkgs.kernelPatches.ubuntu_fan_4_4 ];
+  #boot.kernelPackages = pkgs.linuxPackages_4_4;
   boot.blacklistedKernelModules = [ "snd_pcsp" "b43" "bcma" "bcma-pci-bridge" ];
   boot.initrd.kernelModules = [ "fbcon" "ohci_hcd" "ehci_hcd" "pata_amd" "sata_nv" "usb_storage" ];
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "virtio_balloon" "virtio_blk" "virtio_pci" "virtio_ring" ];
   boot.cleanTmpDir = true;
   boot.kernel.sysctl = {
       # Note that inotify watches consume 1kB on 64-bit machines.
@@ -106,6 +107,7 @@
 
   virtualisation.docker.enable = true;
   virtualisation.docker.storageDriver = "devicemapper";
+  virtualisation.libvirtd.enable = true;
 
   security.sudo.enable = true;
   security.sudo.wheelNeedsPassword = false;
@@ -138,9 +140,12 @@
   # $ nix-env -qaP | grep wget
 
   environment.systemPackages = with pkgs; [
-    abduco abiword acpi anki arandr asciinema aws-auth awscli bazaar bind binutils blueman bmon bridge-utils cmus cnijfilter2 compton ctags cups-bjnp curl cvs cvs_fast_export darcs deluge desktop_file_utils 
-#    dhcp dhcpcd di dmenu2 dnsmasq dropbox dunst dvtm emacs evince exiv2 file firefoxWrapper fuse fzf gcc gimp git glib global glxinfo gnome3 gnumake gnupg21 google-chrome gpm graphviz gtk2 gtypist haskellPackages 
-#    hdparm hicolor_icon_theme hipchat hplip htop i3lock i3status idea iftop inkscape iomelt iptables irssi isync iw jdk jnettop jq leiningen libreoffice libsysfs libva lr lsof lxc lynx man-pages mc mercurialFull 
+    abduco abiword acpi anki arandr asciinema aws-auth awscli bazaar bind binutils blueman bmon bridge-utils cmus cnijfilter2 compton ctags cups-bjnp curl cvs cvs_fast_export darcs deluge desktop_file_utils
+    dhcp dhcpcd di dmenu2 debootstrap dnsmasq dropbox dunst dvtm emacs evince exiv2 file firefoxWrapper fuse fzf gcc gimp git glib glxinfo global gnumake gnupg google-chrome gpm graphviz gtk2 gtypist
+    hdparm hicolor_icon_theme hipchat hplip rpm-ostree htop i3lock i3status 
+    #idea 
+    iftop inkscape iomelt iptables 
+    #irssi isync iw jdk jnettop jq leiningen libreoffice libsysfs libva lr lsof lxc lynx man-pages mc mercurialFull 
 #    mkpasswd mongodb-tools mosh mpv msmtp mtr ncdu ncurses neomutt networkmanagerapplet nix-prefetch-scripts nix-repl nmap notmuch nq nssTools openocd openssl openvswitch pagemon pass pavucontrol pciutils peco 
 #    pinentry pkgconfig playerctl powertop psmisc python2Full python2Packages python36Full pythonPackages qt5.qtbase ranger reptyr ripgrep rofi rpm rtags rxvt_unicode rxvt_unicode_with-plugins scrot 
 #    shared_mime_info silver-searcher skype socat sshfsFuse sshpass stalonetray stunnel sublime3 subversion sxhkd sxiv taffybar tango-icon-theme taskwarrior termite texstudio tmux torbrowser tree tweak 
@@ -229,8 +234,12 @@
 
   # The NixOS release to be compatible with for stateful data such as databases.
   system.autoUpgrade.enable = true;
-  system.autoUpgrade.channel = https://nixos.org/channels/nixos-17.03;
-  system.stateVersion = "17.03";
+#  system.autoUpgrade.channel = https://nixos.org/channels/nixos-17.03;
+#  system.stateVersion = "17.03";
+  system.autoUpgrade.channel = https://nixos.org/channels/nixos-17.09;
+  system.stateVersion = "17.09";
+#  system.autoUpgrade.channel = https://nixos.org/channels/nixos-unstable;
+#  system.stateVersion = "unstable";
 
   nixpkgs.config.allowBroken = false;
   nixpkgs.config.allowUnfree = true;
