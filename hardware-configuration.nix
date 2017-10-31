@@ -64,20 +64,20 @@
   fileSystems."/mnt/helly/C" =
     { device = "//helly/C";
       fsType = "cifs";
-      options = [ "username=domini" "password=Hfvinfqy1" "file_mode=02" "dir_mode=02" ];
+      options = [ "username=domini" "password=Hfvinfqy1" "file_mode=02" "dir_mode=02" "x-systemd.automount" ];
     };
 
 
   fileSystems."/mnt/helly/D" =
     { device = "//helly/D";
       fsType = "cifs";
-      options = [ "username=domini" "password=Hfvinfqy1" "file_mode=02" "dir_mode=02" ];
+      options = [ "username=domini" "password=Hfvinfqy1" "file_mode=02" "dir_mode=02" "x-systemd.automount" ];
     };
 
   fileSystems."/mnt/oleg" =
     { device = "//John-pc/C";
       fsType = "cifs";
-      options = [ "username=domini" "password=hfvinfqy" "file_mode=02" "dir_mode=02" ];
+      options = [ "username=domini" "password=hfvinfqy" "file_mode=02" "dir_mode=02" "x-systemd.automount" ];
     };
 
   nix.maxJobs = lib.mkDefault 2;

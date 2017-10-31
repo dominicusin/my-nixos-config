@@ -10,6 +10,9 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
+    require =
+    [
+    ];
 
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
@@ -38,11 +41,12 @@
   boot.kernelParams = [ "video=1920x1080" ];
   boot.kernelModules = [ "snd-seq" "snd-rawmidi"  "kvm-intel" "r8169" "snd_hda_intel" "exfat" "exfat-nofuse" "msr" "coretemp"  ];
   #boot.kernelPatches = [ pkgs.kernelPatches.ubuntu_fan_4_4 ];
-  #boot.kernelPackages = pkgs.linuxPackages_4_4;
+  #boot.kernelPackages = pkgs.linux_grsec_server_latest;# pkgs.linuxPackages_4_11; #pkgs.linuxPackages_4_4;
   boot.blacklistedKernelModules = [ "snd_pcsp" "b43" "bcma" "bcma-pci-bridge" ];
-  boot.initrd.kernelModules = [ "fbcon" "ohci_hcd" "ehci_hcd" "pata_amd" "sata_nv" "usb_storage" ];
+  boot.initrd.kernelModules = [ "fbcon" "ohci_hcd" "ehci_hcd" "pata_amd" "sata_nv" "usb_storage"  "kvm-intel" "tun" "virtio" ];
   boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "virtio_balloon" "virtio_blk" "virtio_pci" "virtio_ring" ];
   boot.cleanTmpDir = true;
+  boot.tmpOnTmpfs = true;
   boot.kernel.sysctl = {
       # Note that inotify watches consume 1kB on 64-bit machines.
 	"fs.inotify.max_user_watches"   = 1048576;   # default:  8192
@@ -81,8 +85,8 @@
       nameservers = [ "8.8.8.8" "8.8.4.4" ];
       wireless.enable = lib.mkForce false;
       enableIPv6 = true;
-      enableIntel3945ABGFirmware = true;
-      enableIntel2200BGFirmware = true;
+      #enableIntel3945ABGFirmware = true;
+      #enableIntel2200BGFirmware = true;
      # Open ports in the firewall.
      # networking.firewall.allowedTCPPorts = [ ... ];
      # networking.firewall.allowedUDPPorts = [ ... ];
@@ -115,6 +119,32 @@
 	root    ALL=(ALL) ALL
 	domini  ALL=(ALL)    NOPASSWD: ALL
   ";
+  security.pam.loginLimits = [
+      {
+        domain = "*";
+        type = "soft";
+        item = "nproc";
+        value = "65000";
+      }
+      {
+        domain = "*";
+        type = "hard";
+        item = "nproc";
+        value = "1000000";
+      }
+      {
+        domain = "*";
+        type = "-";
+        item = "nofile";
+        value = "1048576";
+      }
+      {
+        domain = "root";
+        type = "-";
+        item = "memlock";
+        value = "unlimited";
+      }
+    ];
 
   hardware = {
       enableRedistributableFirmware = true;
@@ -139,10 +169,16 @@
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
 
-  environment.systemPackages = with pkgs; [
+  environment= {
+      variables = {
+	TERMINFO_DIRS = "/run/current-system/sw/share/terminfo";
+	ASPELL_CONF = "dict-dir /run/current-system/sw/lib/aspell";
+		};
+  systemPackages = with pkgs; [
     abduco abiword acpi anki arandr asciinema aws-auth awscli bazaar bind binutils blueman bmon bridge-utils cmus cnijfilter2 compton ctags cups-bjnp curl cvs cvs_fast_export darcs deluge desktop_file_utils
     dhcp dhcpcd di dmenu2 debootstrap dnsmasq dropbox dunst dvtm emacs evince exiv2 file firefoxWrapper fuse fzf gcc gimp git glib glxinfo global gnumake gnupg google-chrome gpm graphviz gtk2 gtypist
     hdparm hicolor_icon_theme hipchat hplip rpm-ostree htop i3lock i3status 
+    bedup duperemove fdupes
     #idea 
     iftop inkscape iomelt iptables 
     #irssi isync iw jdk jnettop jq leiningen libreoffice libsysfs libva lr lsof lxc lynx man-pages mc mercurialFull 
@@ -151,10 +187,31 @@
 #    shared_mime_info silver-searcher skype socat sshfsFuse sshpass stalonetray stunnel sublime3 subversion sxhkd sxiv taffybar tango-icon-theme taskwarrior termite texstudio tmux torbrowser tree tweak 
 #    unclutter unzip urlview usbutils vanilla-dmz vdpauinfo vifm vis vmtouch vnstat w3m-full watchman weechat wget winetricks wineUnstable wmctrl xautolock xclip xe xidel xlsfonts xorg xsel xss-lock 
     zathura zip zsh
-  ];
+    
+    patchelf nixUnstable file nix-repl wget
+    ack adobe-reader ansible ansible2 ant apparmor-pam apparmor-parser apparmor-profiles apparmor-utils arduino asciinema aspell aspellDicts.en aspellDicts.fr atom autoconf axel babeltrace bc bedup bind bridge-utils bundix
+    calibre cargo cdrkit citrix_receiver clang cloc cloud-init cntlm containerd corkscrew davmail dia dmidecode docbook5 docbook_xml_xslt docker docker-machine docker-machine-kvm dos2unix duperemove ebtables
+    eclipses.eclipse-platform evince expect fasd ffmpeg filezilla firefox fop freemind freerdp gcc6 gdb gimp gitAndTools.gitFull gnome3.cheese gnome3.gconf gnome3.networkmanager_openconnect gnome3.pomodoro gnucash gnumake
+    gnupg go2nix google-chrome google-cloud-sdk gradle graphviz gtk-recordmydesktop guile
+     haskellPackages.hledger
+     icedtea_web  idea.pycharm-community iftop imagemagick inkscape kubernetes
+    languagetool
+    # ledger
+     libguestfs libinput libmysql libpcap libproxy libreoffice libvirt libxslt libyaml lsh lsof ltrace lttng-tools lttng-ust maven meld mercurial midori minikube mosquitto mpv nasm ncdu neovim nethogs 
+    nfs-utils nix-prefetch-git nodejs nodePackages.gulp nss ntopng openconnect openjdk openssl oraclejdk8 packer pandoc paprefs pavucontrol pciutils pdftk php php70Packages.composer pidgin-with-plugins pipelight pkgconfig
+    plantuml platformio playonlinux popfile proxychains psmisc pwgen
+    # pypi2nix python27Packages.libvirt python27Packages.pip python2Full python35 python35Packages.docker_compose python35Packages.libvirt python35Packages.paho-mqtt
+    # python35Packages.pip python35Packages.virtualenv pythonPackages.dopy pythonPackages.ipython pythonPackages.markupsafe pythonPackages.pyaml  pythonPackages.yamllint pythonPackages.yapf
+     qpdfview 
+    rfkill rsync ruby rustracer s3cmd screen scribus shellcheck simple-scan simplescreenrecorder skype slack spotify sqldeveloper sshpass steam stow subversionClient sysdig system-config-printer tcpdump terminator
+     testdisk transmission_gtk tree unzipNLS vagrant virtmanager virt-viewer visualvm vlc weechat wineStaging winetricks wireshark-gtk xdg-user-dirs zeal zsh
+ 
+
+
+    ];
+  };
 
   # List services that you want to enable:
-
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
@@ -234,22 +291,35 @@
 
   # The NixOS release to be compatible with for stateful data such as databases.
   system.autoUpgrade.enable = true;
-#  system.autoUpgrade.channel = https://nixos.org/channels/nixos-17.03;
-#  system.stateVersion = "17.03";
-  system.autoUpgrade.channel = https://nixos.org/channels/nixos-17.09;
-  system.stateVersion = "17.09";
-#  system.autoUpgrade.channel = https://nixos.org/channels/nixos-unstable;
-#  system.stateVersion = "unstable";
+  #system.stateVersion = "18.03"; #"17.09"; # "17.03";
+  #system.autoUpgrade.channel = https://nixos.org/channels/nixos-unstable; #https://nixos.org/channels/nixos-17.09; #https://nixos.org/channels/nixos-17.03;
 
+  system.stateVersion = "17.09"; # "17.03";
+  system.autoUpgrade.channel = https://nixos.org/channels/nixos-17.09; #https://nixos.org/channels/nixos-17.03;
+
+  nixpkgs.config.pulseaudio = true;
   nixpkgs.config.allowBroken = false;
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.pulseaudio = true;
+  nixpkgs.config.permittedInsecurePackages = [
+            "samba-3.6.25"
+  ];
 
   nix.binaryCaches = [ http://cache.nixos.org http://hydra.nixos.org ];
   nix.maxJobs = 4;
   nix.gc.automatic = true;
   nix.gc.dates = "daily";
   nix.gc.options = "--delete-older-than 1h";
+  nix.extraOptions = ''
+      gc-keep-outputs = false
+      gc-keep-derivations = false
+      build-use-sandbox = true
+      build-chroot-dirs = $(nix-store -qR $(nix-build '<nixpkgs>' -A bash) | xargs echo /bin/sh=$(nix-build '<nixpkgs>' -A bash)/bin/bash)
+      build-max-jobs = 5
+      build-cores = 2
+      auto-optimise-store = true
+      trusted-users = root domini
+      allowed-users = * 
+  '';
 
 
 }
