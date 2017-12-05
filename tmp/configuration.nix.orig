@@ -50,7 +50,7 @@
       };
       initrd = {
           kernelModules = [ "fbcon" "ohci_hcd" "ehci_hcd" "pata_amd" "sata_nv" "usb_storage"  "kvm-intel" "tun" "virtio" ];
-          availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "virtio_balloon" "virtio_blk" "virtio_pci" "virtio_ring" ];
+          availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" "virtio_balloon" "virtio_blk" "virtio_pci" "virtio_ring" ];# "bcachefs"
       };
       loader = {
           systemd-boot.enable = true;
@@ -81,6 +81,11 @@
   networking = {
       hostName = "absolon";
       hostId = "a8c0b902";
+      nat = {
+          enable = true;
+          internalInterfaces = ["ve-+"];
+          externalInterface = "wlp4s0";
+      };
       networkmanager.enable = lib.mkForce true;
       networkmanager.insertNameservers = [ "8.8.8.8" "8.8.4.4" ];
       nameservers = [ "8.8.8.8" "8.8.4.4" ];
@@ -112,6 +117,8 @@
     enableFontDir = true;
     enableCoreFonts = true;
     enableGhostscriptFonts = true;
+    fontconfig.dpi = 115;
+    fontconfig.subpixel.rgba = "bgr";
     fonts = with pkgs; [
       corefonts
       fantasque-sans-mono
@@ -152,6 +159,7 @@
       cpu.intel.updateMicrocode = true;
       cpu.amd.updateMicrocode = false;
       facetimehd.enable = true;
+      firmware = [ pkgs.firmwareLinuxNonfree ]; # For any other wifi firmware
       opengl.enable = true;
       opengl.driSupport = true;
       opengl.driSupport32Bit = true;
@@ -177,11 +185,15 @@
       bash = {
          enableCompletion = true;
          interactiveShellInit = ''
-                HISTCONTROL=ignoreboth:erasedups
+                HISTFILESIZE=
+                HISTSIZE=
                 shopt -s histappend
+                HISTCONTROL=ignoreboth:erasedups
+                PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
          '';
          promptInit = ''
-                PS1="\[\033[1;32m\][\u@\h:\w]\$ "
+                export PS1="\[\e[32m\]\u\[\e[m\]@\[\e[32m\]\H\[\e[m\]:\[\e[34;40m\]\w\[\e[m\]\\$ "
          '';
          shellAliases = { ssh = "TERM=xterm-256color ssh"; };
       };
@@ -238,6 +250,9 @@
               EDITOR = pkgs.lib.mkOverride 0  "emacsclient -c";
               BROWSER = pkgs.lib.mkOverride 0 "firefox";
       };
+      extraInit = ''
+               dmesg -D
+      '';
       etc = {
           gitconfig.text = ''
                [user]
@@ -251,6 +266,9 @@
                   default = simple
                [merge]
                   conflictstyle = diff3
+         '';
+         "bashrc.local".text = ''
+               dmesg -D
          '';
          "stack/config.yaml".text = ''
                   templates:
@@ -267,9 +285,9 @@
 
 
   powerManagement = {
-     enable = true;
-     cpuFreqGovernor = "performance";
+     enable = true; cpuFreqGovernor = "performance";
   };
+
 
 
   services = {  # List services that you want to enable:
@@ -279,6 +297,7 @@
     kbfs.enable = true;
     acpid.enable = true;
     dnsmasq.enable = false;
+    redshift.enable = true;
     gnome3.tracker.enable = false;
     mpd = {
           enable = true;
@@ -295,7 +314,7 @@
       '';
     };
     redis =   {
-          enable = true;
+          enable = false;
           unixSocket = "/tmp/redis.sock";
     };
     syncthing = {
@@ -311,27 +330,34 @@
     };
     xserver = {   # Enable the X11 windowing system.
        enable = true;
-       autorun = true;
+       #autorun = true;
        layout = "us,ru(winkeys)";
        enableCtrlAltBackspace = true;
        libinput.enable = true;
        xkbModel="geniuscomfy2";
        xkbOptions = "grp:alt_shift_toggle,grp:win_switch,terminate:ctrl_alt_bksp,grp_led:scroll,altwin:menu";
        videoDrivers = [ "intel" ];
+       deviceSection = ''
+              Option     "Accel"                    "True"
+              Option "DRI3" "1"
+       '';
+       monitorSection = ''
+              DisplaySize 698 393
+       '';
        desktopManager = {   # Enable  Desktop Environment.
           #slim.enable = false;
           enlightenment.enable = true; #e19.enable = true;
           #gnome3.debug
           gnome3.enable = true;
-          #gnome3.extraGSettingsOverridePack
+          gnome3.extraGSettingsOverridePackages = [ pkgs.gnome3.nautilus ];
           #gnome3.extraGSettingsOverrides
-          #gnome3.sessionPath
+          #gnome3.sessionPath = [ pkgs.gnome3.gpaste ];
           #kde5 = true;
-          kodi.enable = true; #xbmc
+          #kodi.enable = true; #xbmc
           #lumina.enable = true;
-          lxqt.enable = true;
+          #lxqt.enable = true;
           mate.enable = true;
-          maxx.enable = true;
+          #maxx.enable = true;
           plasma5.enable = true;
           plasma5.enableQt4Support = true;
           #wallpaper.combineScreens
@@ -339,26 +365,18 @@
           xfce.enable = true;
           xfce.enableXfwm = true;
           #xfce.extraSessionCommands
-          #xfce.noDesktop
-          #xfce.screenLock
-          xfce.thunarPlugins = [ pkgs.xfce.thunar-archive-plugin pkgs.xfce.thunar_volman ];
+          xfce.noDesktop = false;
+          xfce.screenLock = "xscreensaver";
+          xfce.thunarPlugins = [ pkgs.xfce.thunar-archive-plugin pkgs.xfce.thunar_volman pkgs.xfce.thunar-dropbox-plugin ];
           xterm.enable = false;
-          default = "xfce";
+          default = "gnome3"; #"xfce"; #"plasma5";"gnome3";"mate";"Enlightenment";
        };
-      displayManager = {
-          gdm.enable = false; gdm.autoLogin.enable = true; gdm.autoLogin.user = "domini";
-          sddm.enable = false; sddm.autoLogin.enable = true; sddm.autoLogin.user = "domini";
-          lightdm.enable = true;
-          lightdm.autoLogin.enable = true;
-          lightdm.autoLogin.user = "domini";
-          sessionCommands = ''
-              #export GTK_PATH=$GTK_PATH:${pkgs.xfce.gtk_xfce_engine}/lib/gtk-2.0 # Set GTK_PATH so that GTK+ can find the Xfce theme engine.
-              #export GTK_DATA_PREFIX=$GTK_DATA_PREFIX:${config.system.path} # Set GTK_DATA_PREFIX so that GTK+ can find the Xfce themes.
-              #export GIO_EXTRA_MODULES=$GIO_EXTRA_MODULES:${pkgs.xfce.gvfs}/lib/gio/modules # Set GIO_EXTRA_MODULES so that gvfs works.
-              ${pkgs.xfce.xfce4settings}/bin/xfsettingsd & # Launch xfce settings daemon.
-              ${pkgs.networkmanagerapplet}/bin/nm-applet & # Network Manager Applet
-        '';
-
+       displayManager = {
+          auto.enable = false; auto.user = "domini";
+          #gdm.enable = false; gdm.autoLogin.enable = true; gdm.autoLogin.user = "domini"; 
+          #sddm.enable = false; sddm.autoLogin.enable = true; sddm.autoLogin.user = "domini";
+          #slim.enable = false; slim.autoLogin.enable = true; slim.autoLogin.user = "domini";
+          lightdm.enable = true; lightdm.autoLogin.enable = true; lightdm.autoLogin.user = "domini";
        };
        windowManager = {
 	  afterstep.enable = true;
@@ -389,7 +407,6 @@
 	  wmii.enable = true;
 	  xmonad.enable = true;
 	  xmonad.enableContribAndExtras = true;
-          default = "twm";
        };
    };
    compton = {
@@ -408,7 +425,7 @@
      uid = 1000;
      description = "Domini Montessori";
      group = "users";
-     #extraGroups = [ "wheel" "disk" "audio" "video" "networkmanager" "systemd-journal"  "vboxuser" "docker" ];
+     extraGroups = [ "wheel" "disk" "audio" "video" "networkmanager" "systemd-journal"  "vboxuser" "docker" ];
      home = "/home/domini";
      createHome = true;
      useDefaultShell = true;
@@ -426,21 +443,19 @@
       pulseaudio = true;
       permittedInsecurePackages = [ "samba-3.6.25" ];
       chromium = { enablePepperFlash = true;  };
-      overlays = [
-          (import /etc/nixos/overlays/nixpkgs-mozilla/rust-overlay.nix)
-          ];
+      overlays = [ (import /etc/nixos/overlays/nixpkgs-mozilla/rust-overlay.nix) ];
   };
 
   nix = {
-      buildCores = 0;
+      buildCores = 4;
       daemonIONiceLevel = 4;
       daemonNiceLevel = 10;
-      maxJobs = 8; #4
+      maxJobs = 2; #4
       gc.automatic = false;
       gc.dates = "daily";
       gc.options = "--delete-older-than 1h";
       #nixPath = [ "/etc/nixos" "nixos-config=/etc/nixos/configuration.nix" ];
-      useSandbox = true; #nix.useChroot
+      useSandbox = false; #nix.useChroot
       binaryCaches = [ http://cache.nixos.org http://hydra.nixos.org "https://nixcache.reflex-frp.org" ];
       binaryCachePublicKeys =  [ "ryantrinkle.com-1:JJiAKaRv9mWgpVAz8dwewnZe0AzzEAzPkagE9SP5NWI=" ];
       trustedUsers =  [ "root" "domini" "@wheel" ];
@@ -448,12 +463,6 @@
               auto-optimise-store = true
               gc-keep-outputs = false
               gc-keep-derivations = false
-              build-use-sandbox = true
-              build-chroot-dirs = $(nix-store -qR $(nix-build '<nixpkgs>' -A bash) | xargs echo /bin/sh=$(nix-build '<nixpkgs>' -A bash)/bin/bash)
-              build-max-jobs = 5
-              build-cores = 2
-              trusted-users = root domini
-              allowed-users = *
       '';
   };
 
@@ -461,6 +470,3 @@
 
 }
 
-
-
- 
