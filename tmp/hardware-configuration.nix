@@ -15,7 +15,17 @@
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/a5ea1594-acb5-4e00-a5a4-d5d06e2072c3";
       fsType = "btrfs";
-      options = [ "subvol=@nixos" ];
+      options = [ "subvol=@nixos" "compress=zlib" "noatime" "nodiratime" ];
+    };
+
+#  fileSystems."/mnt/efi" =
+#    { device = "/dev/disk/by-uuid/5419-C76D";
+#      fsType = "vfat";
+#    };
+
+  fileSystems."/mnt/mainboot" =
+    { device = "/dev/disk/by-uuid/185e34fe-4a77-42a5-a7af-f8d1be061c68";
+      fsType = "ext4";
     };
 
   fileSystems."/tmp" =
@@ -23,26 +33,22 @@
       fsType = "tmpfs";
     };
 
-  fileSystems."/home" =
-    { device = "/dev/disk/by-uuid/a5ea1594-acb5-4e00-a5a4-d5d06e2072c3";
-      fsType = "btrfs";
-      options = [ "subvol=@home" ];
-    };
-
   fileSystems."/mnt/btrfs" =
     { device = "/dev/disk/by-uuid/a5ea1594-acb5-4e00-a5a4-d5d06e2072c3";
       fsType = "btrfs";
-      options = [ "subvol=@home" ];
+      options = [ "subvol=/" "compress=zlib" "noatime" "nodiratime" ];
     };
 
-  fileSystems."/mnt/mainboot" =
-    { device = "/dev/disk/by-uuid/185e34fe-4a77-42a5-a7af-f8d1be061c68";
-      fsType = "ext4";
+  fileSystems."/home" =
+    { device = "/dev/disk/by-uuid/a5ea1594-acb5-4e00-a5a4-d5d06e2072c3";
+      fsType = "btrfs";
+      options = [ "subvol=@home" "compress=zlib" "noatime" "nodiratime" ];
     };
 
   swapDevices =
-    [ { device = "/dev/disk/by-uuid/eba7360a-c0a0-4458-bffc-e401dfb86dc2"; }
+    [ { device = "/dev/disk/by-label/swap"; }
     ];
 
   nix.maxJobs = lib.mkDefault 2;
 }
+
