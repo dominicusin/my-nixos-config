@@ -13,12 +13,11 @@
           enlightenment.enable = true; #e19.enable = true;
           gnome3.enable = true;
           gnome3.extraGSettingsOverridePackages = [ pkgs.gnome3.nautilus ];
-          #gnome3.extraGSettingsOverrides
-          #gnome3.sessionPath = [ pkgs.gnome3.gpaste ];
-          #kde5 = true;
-          #kodi.enable = true; #xbmc
-          #lumina.enable = true;
-          #lxqt.enable = true;
+          gnome3.sessionPath = [ pkgs.gnome3.gpaste ];
+          kde5 = true;
+          kodi.enable = true; #xbmc
+          lumina.enable = true;
+          lxqt.enable = true;
           mate.enable = true;
           plasma5.enable = true;
           plasma5.enableQt4Support = true;
@@ -26,7 +25,7 @@
           xfce.enableXfwm = true;
           xfce.noDesktop = false;
           xfce.screenLock = "xscreensaver";
-          xfce.thunarPlugins = [ pkgs.xfce.thunar-archive-plugin pkgs.xfce.thunar_volman pkgs.xfce.thunar-dropbox-plugin ];
+          xfce.thunarPlugins = with pkgs.xfce; [ .thunar-archive-plugin pkgs.xfce.thunar_volman pkgs.xfce.thunar-dropbox-plugin ];
           xterm.enable = false;
           default = "xfce"; #"plasma5";"gnome3";"mate";"Enlightenment";
        };
