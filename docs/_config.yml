@@ -1,1 +1,10 @@
-theme: jekyll-theme-hacker
+theme: jekyll-theme-hacker---
+title: My Nixos Config
+timezone: UTC
+collections:
+  posts:
+    title: Posts
+    output: true
+  uploads:
+    title: Uploads
+    output: true
