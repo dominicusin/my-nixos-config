@@ -49,9 +49,9 @@
      enablePepperPDF = true;
      enableGnomeExtensions = true;
     };
-    stdenv.userHook = ''
-       NIX_CFLAGS_COMPILE+=" -march=native -O2 -pipe"
-    '';
+    #stdenv.userHook = ''
+    #   NIX_CFLAGS_COMPILE+=" -march=native -O2 -pipe"
+    #'';
 
    };
 
