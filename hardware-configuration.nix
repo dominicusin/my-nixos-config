@@ -23,14 +23,10 @@
       fsType = "tmpfs";
     };
 
-  fileSystems."/mnt/mainboot" =
-    { device = "/dev/disk/by-uuid/185e34fe-4a77-42a5-a7af-f8d1be061c68";
-      fsType = "ext4";
-    };
-
   fileSystems."/mnt/btrfs" =
     { device = "/dev/disk/by-uuid/a5ea1594-acb5-4e00-a5a4-d5d06e2072c3";
       fsType = "btrfs";
+      options = [ "subvol=@home" ];
     };
 
   fileSystems."/home" =
@@ -39,69 +35,9 @@
       options = [ "subvol=@home" ];
     };
 
-  fileSystems."/mnt/trueOS/mnt" =
-    { device = "trueOS/ROOT/initial";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/tmp" =
-    { device = "trueOS/tmp";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/usr/home" =
-    { device = "trueOS/usr/home";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/usr/home/domini" =
-    { device = "trueOS/usr/home/domini";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/usr/jails" =
-    { device = "trueOS/usr/jails";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/usr/local/share/doc" =
-    { device = "trueOS/usr/local/share/doc";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/usr/obj" =
-    { device = "trueOS/usr/obj";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/usr/ports" =
-    { device = "trueOS/usr/ports";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/usr/src" =
-    { device = "trueOS/usr/src";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/var/audit" =
-    { device = "trueOS/var/audit";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/var/log" =
-    { device = "trueOS/var/log";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/var/mail" =
-    { device = "trueOS/var/mail";
-      fsType = "zfs";
-    };
-
-  fileSystems."/mnt/trueOS/var/tmp" =
-    { device = "trueOS/var/tmp";
-      fsType = "zfs";
+  fileSystems."/mnt/mainboot" =
+    { device = "/dev/disk/by-uuid/185e34fe-4a77-42a5-a7af-f8d1be061c68";
+      fsType = "ext4";
     };
 
   swapDevices =

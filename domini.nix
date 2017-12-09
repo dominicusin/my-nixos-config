@@ -1,6 +1,5 @@
 { config, lib, pkgs, ... }:
 
-
 {
 
   security.sudo.configFile="
@@ -19,7 +18,6 @@
       { domain = "domini"; item = "nofile"; type = "soft"; value = "99999"; }
       { domain = "domini"; item = "nofile"; type = "hard"; value = "99999"; }
   ];
-
   environment.etc = {
           gitconfig.text = ''
                [user]
@@ -43,10 +41,7 @@
                      nix::
                         enable: true
          '';
-    };
   };
-
-
   services = { 
       mpd = {
           enable = true;
@@ -62,6 +57,11 @@
               }
       '';
     };
+    emacs = {
+        install = true;
+        enable = true;
+        #package = import /home/domini/.emacs.d { pkgs = pkgs; };
+    };
     syncthing = {
         enable = true;
         useInotify = true;
@@ -75,9 +75,9 @@
           #sddm.enable = false; sddm.autoLogin.enable = true; sddm.autoLogin.user = "domini";
           #slim.enable = false; slim.autoLogin.enable = true; slim.autoLogin.user = "domini";
           lightdm.enable = true; lightdm.autoLogin.enable = true; lightdm.autoLogin.user = "domini";
-       };
-
-  users.mutableUsers = true;
+    };
+  };
+  #users.mutableUsers = true;
   users.extraUsers.domini = { # Define a user account. Don't forget to set a password with ‘passwd’.
      name = "domini";
      isNormalUser = true;
@@ -90,7 +90,6 @@
      useDefaultShell = true;
      openssh.authorizedKeys.keys = [ "ssh-dss AAAAB3NzaC1kc3MAAACBAOhcMJyuEf4AgS/LFwC23A/bcsGOkM33Mdoba5BXLHFE7UK62FteESwYNvY7oeSkJbsLzdpx6ntZmq5dNiWHCboqwtnzpVqL/PC0MGwLjuOuV43/k8+xYy2p2bJHb/mzuV9ew1sheK7F5f8LASkBGNiu5CR5puSxsnAaj8Bzi6GPAAAAFQDpO3+76Pj2I+STO7+afJMpht371QAAAIAHumBbnFiweZFHb7sqVphL7e1e35A09bzCzHh7SHAWQ817lkfM+LdeX2rTAxaufL2g7RBn10R4OyFbsTFiNpTo4KOsoPjeerOpJe4rR03gkXNWO1aOwx9kWJ5IjC7DgH6N+j7Oz7jXU9cGMa95QpN3UMCuDTnyQhozahP3gCEA+AAAAIBw2rcyQA6koR3XGkSq1XY/1rPZKPGFoCjSFf1R+OyNp8zkQ09rM9payU9nyirR8HOy5j1+y3F2e/5Sf9dpBfk0+bsqgwUCu3YoKl7uq8TROIU+eIwZKaytq/cVBaup5poee0GR4kn/dX4tV6qrh3cDIFl/SgUgkxJdunRb9VZtSQ== domini@absolon.hitech.local.prv" ];
   };
-
   nix = {
       trustedUsers =  [ "root" "domini" "@wheel" ];
       extraOptions = ''
@@ -98,7 +97,6 @@
               allowed-users = root domini
       '';
   };
-
 
 
 }

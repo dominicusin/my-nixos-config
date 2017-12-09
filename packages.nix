@@ -1,22 +1,22 @@
 
 pkgs: with pkgs; [
 
-    aspellDicts.en aspellDicts.ru
+    (import ./emacs.nix { inherit pkgs; })
     eclipses.eclipse-platform
     gnome3.cheese gnome3.gconf gnome3.networkmanager_openconnect gnome3.pomodoro
-    haskellPackages.ghc-mod haskellPackages.hledger haskellPackages.hledger-web
     idea.pycharm-community
     linuxPackages.perf
     nodePackages.coffee-script nodePackages.gulp
     php70Packages.composer
     python27Packages.docker_compose python27Packages.libvirt python27Packages.pip 
     python35Packages.docker_compose python35Packages.libvirt python35Packages.paho-mqtt python35Packages.pip python35Packages.virtualenv 
-    pythonPackages.dopy pythonPackages.ipython pythonPackages.markupsafe pythonPackages.pyaml pythonPackages.yamllint pythonPackages.yapf
     qt5.qtbase
     xfce.exo xfce.gtk_xfce_engine xfce.gvfs xfce.terminal xfce.thunar xfce.thunar_volman xfce.xfce4icontheme xfce.xfce4settings xfce.xfconf 
     xlibs.xev
     xorg.xdpyinfo xorg.xkill xorg.xmodmap xorg.xinit
     #sqldeveloper
+    zile mg
+
 
     abduco abiword ack acpi adobe-reader amsn android-studio anki ansible ansible2 ant apparmor-pam apparmor-parser apparmor-profiles apparmor-utils arandr arduino aria2 asciinema aspell atom atool autoconf aws-auth awscli 
     axel babeltrace bar-xft bazaar bc bedup beets bind binutils bitcoin bitcoin-xt bitlbee bitlbee-facebook bitlbee-steam blink blueman bmon boot bridge-utils bundix bwm_ng cabal2nix calc calibre cargo cdrkit centerim 
@@ -38,4 +38,7 @@ pkgs: with pkgs; [
 
 
 ]
-
+ ++ (with aspellDicts; [ en ru])
+ ++ (with haskellPackages; [ ghc-mod hledger hledger-web ])
+ ++ (with pythonPackages; [ dopy ipython markupsafe pyaml yamllint yapf])
+ 

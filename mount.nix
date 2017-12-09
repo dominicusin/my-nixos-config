@@ -21,11 +21,11 @@
 #     };
 
 
-#  fileSystems."/mnt/helly/D" =
-#     { device = "//helly/D";
-#       fsType = "cifs";
-#       options = [ "username=domini" "password=Hfvinfqy1" "file_mode=02" "dir_mode=02" "x-systemd.automount" ];
-#     };
+  fileSystems."/mnt/helly/D" =
+     { device = "//192.168.2.160/D";
+       fsType = "cifs";
+       options = [ "username=domini" "password=Hfvinfqy1" "file_mode=02" "dir_mode=02" "x-systemd.automount" ];
+     };
 
    fileSystems."/" = { options = ["noatime" "nodiratime" "compress=zlib"];  };
 
