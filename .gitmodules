@@ -1,6 +1,9 @@
 [submodule "nixpkgs-mozilla"]
-	path = nixpkgs-mozilla
+	path = overlay/nixpkgs-mozilla
 	url = https://github.com/mozilla/nixpkgs-mozilla.git
 [submodule "nixpkgs"]
 	path = nixpkgs
 	url = https://github.com/NixOS/nixpkgs
+[submodule "overlay/nixpkgs-mozilla"]
+	path = overlay/nixpkgs-mozilla
+	url = https://github.com/mozilla/nixpkgs-mozilla.git

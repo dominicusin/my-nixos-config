@@ -1,4 +1,4 @@
-{ config,lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   services.xserver = {
@@ -14,19 +14,16 @@
           gnome3.enable = true;
           gnome3.extraGSettingsOverridePackages = [ pkgs.gnome3.nautilus ];
           gnome3.sessionPath = [ pkgs.gnome3.gpaste ];
-          kde5 = true;
-          kodi.enable = true; #xbmc
-          lumina.enable = true;
-          lxqt.enable = true;
-          mate.enable = true;
+          #kodi.enable = true; #xbmc
+          #lumina.enable = true;
+          #lxqt.enable = true;
+          #mate.enable = true;
           plasma5.enable = true;
           plasma5.enableQt4Support = true;
           xfce.enable = true;
           xfce.enableXfwm = true;
-          xfce.noDesktop = false;
           xfce.screenLock = "xscreensaver";
-          xfce.thunarPlugins = with pkgs.xfce; [ .thunar-archive-plugin pkgs.xfce.thunar_volman pkgs.xfce.thunar-dropbox-plugin ];
-          xterm.enable = false;
+          xfce.thunarPlugins = with pkgs.xfce; [ thunar-archive-plugin thunar_volman thunar-dropbox-plugin ];
           default = "xfce"; #"plasma5";"gnome3";"mate";"Enlightenment";
        };
        windowManager = {
@@ -42,7 +39,6 @@
           i3.enable = true;
           icewm.enable = true;
           jwm.enable = true;
-          metacity.enable = true;
           mwm.enable = true;
           notion.enable = true;
           openbox.enable = true;

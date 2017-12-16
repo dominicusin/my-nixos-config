@@ -28,5 +28,8 @@
      };
 
    fileSystems."/" = { options = ["noatime" "nodiratime" "compress=zlib"];  };
+   fileSystems."/mnt/btrfs" = { options = [ "subvol=/" "noatime" "nodiratime" "compress=zlib" ]; };
+   
 
 }
+

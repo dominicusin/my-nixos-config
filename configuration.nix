@@ -1,17 +1,20 @@
-{ config,lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
+  require = [
+      <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
+      #(builtins.fetchgit https://github.com/edolstra/dwarffs + "/module.nix")
+  ];
   imports =
     [
       ./hardware-configuration.nix
       ./mount.nix
       ./domini.nix
       ./xserver.nix
-      #(builtins.fetchgit https://github.com/edolstra/dwarffs + "/module.nix")
+      ./boot.nix
+      ./virtualisation.nix
+      ./services.nix
     ];
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "nodev";
-  boot.kernelParams = [ "video=1920x1080" ];
   networking = {
       hostName = "absolon";
       hostId = "a8c0b902";
@@ -36,13 +39,16 @@
   environment.systemPackages = import ./packages.nix pkgs;
   powerManagement = { enable = true; cpuFreqGovernor = "performance"; };
 
-  services.gpm.enable = true;
+
    nixpkgs.config = {
     allowUnfree = true;
+    allowBroken = true;
+    sc2-headless.accept_license = true;
     firefox = {
      enableGoogleTalkPlugin = true;
      enableAdobeFlash = true;
      enableGnomeExtensions = true;
+     enableGeckoMediaPlayer = true;
     };
     chromium = {
      enablePepperFlash = true;

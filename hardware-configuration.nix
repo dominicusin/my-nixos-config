@@ -26,7 +26,7 @@
   fileSystems."/mnt/btrfs" =
     { device = "/dev/disk/by-uuid/a5ea1594-acb5-4e00-a5a4-d5d06e2072c3";
       fsType = "btrfs";
-      options = [ "subvol=@home" ];
+      options = [ "subvol=/" ];
     };
 
   fileSystems."/home" =
