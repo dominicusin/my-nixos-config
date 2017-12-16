@@ -7,3 +7,6 @@
 [submodule "overlay/nixpkgs-mozilla"]
 	path = overlay/nixpkgs-mozilla
 	url = https://github.com/mozilla/nixpkgs-mozilla.git
+[submodule "nixos"]
+	path = nixos
+	url = https://github.com/NixOS/nixos
